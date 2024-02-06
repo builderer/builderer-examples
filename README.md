@@ -14,7 +14,36 @@ This repository contains some example usage of [Builderer](https://github.com/bu
   * C/C++ toolchain: `build-essential`, `g++-multilib`
   * GLFW requires: `libx11-dev`, `libxcursor-dev`, `libxinerama-dev`, `libxi-dev`
 
-## VSCode
+## Command-line Instructions
+For users that prefer building directly on command-line, or for the purposes of automation...
+### Create Python Virtual Environment
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+### Generate Build Files
+Config options: `windows`, `linux`, `macos`
+```bash
+builderer --config=CONFIG_OF_CHOICE_HERE generate
+```
+### Building (Linux)
+```bash
+builderer --config=linux generate
+make -C Out/build/linux -j$(nproc) build
+```
+### Building (macOS)
+```bash
+builderer --config=macos generate
+make -C Out/build/macos -j$(sysctl -n hw.logicalcpu) build
+```
+### Building (Windows)
+```bash
+builderer --config=windows generate
+msbuild Out/build/windows/Solution.sln /p:Platform=x64 /p:Configuration=debug
+```
+
+## VSCode Instructions
 VSCode provides a seamless development solution for Windows, Mac and Linux that
 works well with Builderer workflow. As such taken care to ensure usage
 instructions are the same regardless of platform when using VSCode.
