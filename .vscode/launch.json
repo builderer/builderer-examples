@@ -1,0 +1,50 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "apps:triangle debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "stopAtEntry": false,
+      "environment": [],
+      "preLaunchTask": "build_debug",
+      "cwd": "${workspaceFolder}",
+      "windows": {
+        "type": "cppvsdbg",
+        "program": "${workspaceFolder}/Out/windows-debug/triangle.exe",
+      },
+      "osx": {
+        "MIMode": "lldb",
+        "program": "${workspaceFolder}/Out/macos-debug/triangle",
+      },
+      "linux": {
+        "MIMode": "gdb",
+        "program": "${workspaceFolder}/Out/linux-debug/triangle",
+      }
+    },
+    {
+      "name": "apps:triangle release",
+      "type": "cppdbg",
+      "request": "launch",
+      "stopAtEntry": false,
+      "environment": [],
+      "preLaunchTask": "build_release",
+      "cwd": "${workspaceFolder}",
+      "windows": {
+        "type": "cppvsdbg",
+        "program": "${workspaceFolder}/Out/windows-release/triangle.exe",
+      },
+      "osx": {
+        "MIMode": "lldb",
+        "program": "${workspaceFolder}/Out/macos-release/triangle",
+      },
+      "linux": {
+        "MIMode": "gdb",
+        "program": "${workspaceFolder}/Out/linux-release/triangle",
+      },
+      "args": [
+        "--profile"
+      ]
+    }
+  ]
+}
