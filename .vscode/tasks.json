@@ -1,0 +1,119 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "generate_build_files",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "command": "${command:python.interpreterPath}",
+      "windows": {
+        "args": [
+          "-m", "builderer",
+          "--config=windows",
+          "generate"
+        ]
+      },
+      "osx": {
+        "args": [
+          "-m", "builderer",
+          "--config=macos",
+          "generate"
+        ]
+      },
+      "linux": {
+        "args": [
+          "-m", "builderer",
+          "--config=linux",
+          "generate"
+        ]
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "build_debug",
+      "dependsOn": [
+        "generate_build_files"
+      ],
+      "windows": {
+        "command": "${workspaceFolder}/.vscode/vsbuild.cmd",
+        "args": [
+          "${workspaceFolder}/Out/build/windows/Solution.sln",
+          "/p:Platform=x64",
+          "/p:Configuration=debug"
+        ],
+        "problemMatcher": [
+          "$msCompile"
+        ]
+      },
+      "osx": {
+        "type": "shell",
+        "command": "make build CONFIG=debug -C${workspaceFolder}/Out/build/macos -j$(sysctl -n hw.logicalcpu)",
+        "problemMatcher": [
+          "$gcc"
+        ]
+      },
+      "linux": {
+        "type": "shell",
+        "command": "make",
+        "args": [
+          "-C",
+          "${workspaceFolder}/Out/build/linux",
+          "build",
+          "-j$(nproc)",
+          "CONFIG=debug"
+        ],
+        "problemMatcher": [
+          "$gcc"
+        ]
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "build_release",
+      "dependsOn": [
+        "generate_build_files"
+      ],
+      "windows": {
+        "command": "${workspaceFolder}/.vscode/vsbuild.cmd",
+        "args": [
+          "${workspaceFolder}/Out/build/windows/Solution.sln",
+          "/p:Platform=x64",
+          "/p:Configuration=release"
+        ],
+        "problemMatcher": [
+          "$msCompile"
+        ]
+      },
+      "osx": {
+        "type": "shell",
+        "command": "make build CONFIG=release -C${workspaceFolder}/Out/build/macos -j$(sysctl -n hw.logicalcpu)",
+        "problemMatcher": [
+          "$gcc"
+        ]
+      },
+      "linux": {
+        "type": "shell",
+        "command": "make",
+        "args": [
+          "-C",
+          "${workspaceFolder}/Out/build/linux",
+          "build",
+          "-j$(nproc)",
+          "CONFIG=release"
+        ],
+        "problemMatcher": [
+          "$gcc"
+        ]
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

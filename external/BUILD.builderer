@@ -1,0 +1,83 @@
+from builderer import Condition, Optional, Switch, Case
+
+pkg = CTX.add_package("external")
+
+pkg.git_repository(
+    name = "glfw_repo",
+    remote = "git@github.com:glfw/glfw.git",
+    sha = "00e86d4b733103a23278fe53ce58a0d14dd47d32",
+)
+
+pkg.cc_library_external(
+  name = "glfw",
+  hdrs = [
+    "{external:glfw_repo}/include/**/*.h",
+  ],
+  srcs = [
+    "{external:glfw_repo}/src/context.c",
+    "{external:glfw_repo}/src/egl_context.c",
+    "{external:glfw_repo}/src/init.c",
+    "{external:glfw_repo}/src/input.c",
+    "{external:glfw_repo}/src/monitor.c",
+    "{external:glfw_repo}/src/null_init.c",
+    "{external:glfw_repo}/src/null_joystick.c",
+    "{external:glfw_repo}/src/null_monitor.c",
+    "{external:glfw_repo}/src/null_window.c",
+    "{external:glfw_repo}/src/osmesa_context.c",
+    "{external:glfw_repo}/src/platform.c",
+    "{external:glfw_repo}/src/vulkan.c",
+    "{external:glfw_repo}/src/window.c",
+    Switch(
+      Case(Condition(platform="linux"),
+        "{external:glfw_repo}/src/egl_context.c",
+        "{external:glfw_repo}/src/glx_context.c",
+        "{external:glfw_repo}/src/linux_joystick.c",
+        "{external:glfw_repo}/src/osmesa_context.c",
+        "{external:glfw_repo}/src/posix_module.c",
+        "{external:glfw_repo}/src/posix_poll.c",
+        "{external:glfw_repo}/src/posix_thread.c",
+        "{external:glfw_repo}/src/posix_time.c",
+        "{external:glfw_repo}/src/x11_init.c",
+        "{external:glfw_repo}/src/x11_monitor.c",
+        "{external:glfw_repo}/src/x11_window.c",
+        "{external:glfw_repo}/src/xkb_unicode.c")
+    )
+  ],
+  public_includes = [
+    "{external:glfw_repo}/include",
+  ],
+  private_defines = [
+    "_GLFW_X11",
+  ],
+  deps = [
+    ":glfw_repo",
+  ],
+)
+
+pkg.cc_library_external(
+  name = "glad",
+  hdrs = [
+    "{external:glfw_repo}/deps/glad/*.h",
+  ],
+  public_includes = [
+    "{external:glfw_repo}/deps",
+  ],
+  sandbox = True,
+  deps = [
+    ":glfw_repo",
+  ],
+)
+
+pkg.cc_library_external(
+  name = "linmath",
+  hdrs = [
+    "{external:glfw_repo}/deps/linmath.h",
+  ],
+  public_includes = [
+    "{external:glfw_repo}/deps",
+  ],
+  sandbox = True,
+  deps = [
+    ":glfw_repo",
+  ],
+)

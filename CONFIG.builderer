@@ -1,0 +1,45 @@
+from builderer.generators.msbuild import MsBuildGenerator
+from builderer.generators.make import MakeGenerator
+
+CTX.add_buildtool(
+    name = "msbuild",
+    generator = MsBuildGenerator,
+)
+
+CTX.add_buildtool(
+    name = "make",
+    generator = MakeGenerator,
+)
+
+CTX.add_config(
+    name = "windows",
+    platform = "windows",
+    architecture = ["x64", "Win32"],
+    buildtool = "msbuild",
+    toolchain = "msvc",
+    build_config = ["debug", "release"],
+    build_root = "Out/build/windows",
+    sandbox_root = "Out/.sandbox",
+)
+
+CTX.add_config(
+    name = "linux",
+    platform = "linux",
+    architecture = ["x86_64", "x86"],
+    buildtool = "make",
+    toolchain = "gcc",
+    build_config = ["debug", "release"],
+    build_root = "Out/build/linux",
+    sandbox_root = "Out/.sandbox",
+)
+
+CTX.add_config(
+    name = "macos",
+    platform = "macos",
+    architecture = ["x86_64"],
+    buildtool = "make",
+    toolchain = "clang",
+    build_config = ["debug", "release"],
+    build_root = "Out/build/macos",
+    sandbox_root = "Out/.sandbox",
+)

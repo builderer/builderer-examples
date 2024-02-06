@@ -1,0 +1,181 @@
+from builderer import Optional, Switch, Case, Condition
+
+BASE_COMPILE_FLAGS = Switch(
+    Case(Condition(platform="windows", toolchain="msvc", build_config="debug"),
+        "/MTd"),
+    Case(Condition(platform="windows", toolchain="msvc"),
+        "/MT"),
+    Case(Condition(platform="macos"),
+        # Target 10.13 to maintain OpenGL support
+        "-mmacosx-version-min=10.13"),
+    Case(Condition(platform="linux")),
+)
+
+C_COMPILE_FLAGS = Switch(
+    Case(Condition(toolchain="msvc"),          "/stc:c17"),
+    Case(Condition(toolchain=["clang","gcc"]), "-std=gnu17"),
+)
+
+CXX_COMPILE_FLAGS = Switch(
+    Case(Condition(toolchain="msvc"), 
+        "/Zc:__cplusplus",
+        "/std:c++20",
+        "/EHsc"),
+    Case(Condition(toolchain=["clang","gcc"]), 
+        "-std=c++20"),
+)
+
+WARNINGS_COMPILE_FLAGS = Switch(
+    Case(Condition(toolchain="msvc"), 
+        "/W4", "/WX"),
+    Case(Condition(toolchain=["clang","gcc"]), 
+        "-Wall", "-Werror"),
+)
+
+NO_WARNINGS_COMPILE_FLAGS = Switch(
+    Case(Condition(toolchain="msvc"), 
+        "/W0", "/WX-",),
+    Case(Condition(toolchain=["clang","gcc"]), 
+        "-w"),
+)
+
+CONFIG_COMPILE_FLAGS = Switch(
+    Case(Condition(toolchain="msvc", build_config="debug"), 
+        "/Od", "/Zi"),
+    Case(Condition(toolchain="msvc", build_config=["profile", "release"]), 
+        "/O2"),
+    Case(Condition(toolchain=["clang","gcc"], build_config="debug"), 
+        "-O0", "-g"),
+    Case(Condition(toolchain=["clang","gcc"], build_config=["profile", "release"]), 
+        "-O2"),
+)
+
+CONFIG_LINK_FLAGS = Switch(
+    Case(Condition(toolchain="msvc", build_config="debug"), 
+        "/DEBUG"),
+    Case(Condition(toolchain=["clang","gcc"], build_config="debug"), 
+        "-g"),
+    Case(Condition()),
+)
+
+CONFIG_DEFINES = Switch(
+    Case(Condition(build_config="debug"), 
+        "DEBUG", "_DEBUG"),
+    Case(Condition(),
+         "NDEBUG"),
+)
+
+# Make builtin git repository visible
+def git_repository(ctx, **kwargs):
+    ctx.builtin.git_repository(**kwargs)
+
+CTX.add_rule(git_repository)
+
+
+# Configure cc_library for first-party code...
+def cc_library(ctx, private_defines=[], **kwargs):
+    ctx.builtin.cc_library(
+        c_flags = [
+            BASE_COMPILE_FLAGS,
+            C_COMPILE_FLAGS,
+            WARNINGS_COMPILE_FLAGS,
+            CONFIG_COMPILE_FLAGS,
+        ],
+        cxx_flags = [
+            BASE_COMPILE_FLAGS,
+            CXX_COMPILE_FLAGS,
+            WARNINGS_COMPILE_FLAGS,
+            CONFIG_COMPILE_FLAGS,
+        ],
+        private_defines = [*private_defines, CONFIG_DEFINES],
+        **kwargs
+    )
+
+CTX.add_rule(cc_library)
+
+
+# Configure cc_binary for first-party code...
+def cc_binary(ctx, name: str, console_app: bool, private_defines=[], **kwargs):
+    ctx.builtin.cc_binary(
+        name = name,
+        c_flags = [
+            BASE_COMPILE_FLAGS,
+            C_COMPILE_FLAGS,
+            WARNINGS_COMPILE_FLAGS,
+            CONFIG_COMPILE_FLAGS,
+        ],
+        cxx_flags = [
+            BASE_COMPILE_FLAGS,
+            CXX_COMPILE_FLAGS,
+            WARNINGS_COMPILE_FLAGS,
+            CONFIG_COMPILE_FLAGS,
+        ],
+        private_defines = [*private_defines, CONFIG_DEFINES],
+        link_flags = [
+            Switch(
+                Case(Condition(platform="windows"),
+                     "/SUBSYSTEM:CONSOLE" if console_app else "/SUBSYSTEM:WINDOWS"),
+                Case(Condition(platform="macos"),
+                    "-framework", "Cocoa",
+                    "-framework", "QuartzCore",
+                    "-framework", "IOKit",
+                    "-framework", "IOSurface",
+                    "-framework", "Metal"),
+                Case(Condition(platform="linux"),
+                    *(["-ldl", "-lpthread"] if console_app else ["-ldl", "-lpthread", "-lX11"])),
+            ),
+            CONFIG_LINK_FLAGS
+        ],
+        output_path = Switch(
+            Case(Condition(platform="windows", build_config="debug"),
+                 f"Out/windows-debug/{name}.exe"),
+            Case(Condition(platform="windows", build_config="profile"),
+                 f"Out/windows-profile/{name}.exe"),
+            Case(Condition(platform="windows", build_config="release"),
+                 f"Out/windows-release/{name}.exe"),
+
+            Case(Condition(platform="macos", build_config="debug"),
+                 f"Out/macos-debug/{name}"),
+            Case(Condition(platform="macos", build_config="profile"),
+                 f"Out/macos-profile/{name}"),
+            Case(Condition(platform="macos", build_config="release"),
+                 f"Out/macos-release/{name}"),
+
+            Case(Condition(platform="linux", build_config="debug"),
+                 f"Out/linux-debug/{name}"),
+            Case(Condition(platform="linux", build_config="profile"),
+                 f"Out/linux-profile/{name}"),
+            Case(Condition(platform="linux", build_config="release"),
+                 f"Out/linux-release/{name}"),
+        ),
+        **kwargs
+    )
+
+CTX.add_rule(cc_binary)
+
+# Configure cc_library for thirt-party code (no warnings)...
+def cc_library_external(ctx, private_defines=[], **kwargs):
+    ctx.builtin.cc_library(
+        c_flags = [
+            BASE_COMPILE_FLAGS,
+            C_COMPILE_FLAGS,
+            NO_WARNINGS_COMPILE_FLAGS,
+            CONFIG_COMPILE_FLAGS,
+        ],
+        cxx_flags = [
+            BASE_COMPILE_FLAGS,
+            CXX_COMPILE_FLAGS,
+            NO_WARNINGS_COMPILE_FLAGS,
+            CONFIG_COMPILE_FLAGS,
+        ],
+        private_defines = [*private_defines, CONFIG_DEFINES],
+        **kwargs
+    )
+
+CTX.add_rule(cc_library_external)
+
+
+def generate_files(ctx, **kwargs):
+    ctx.builtin.generate_files(**kwargs)
+
+CTX.add_rule(generate_files)

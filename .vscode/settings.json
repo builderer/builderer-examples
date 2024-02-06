@@ -1,0 +1,23 @@
+{
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "C_Cpp.autoAddFileAssociations": false,
+    "C_Cpp.errorSquiggles": "disabled",
+    "C_Cpp.dimInactiveRegions": false,
+    "files.associations": {
+      "*.builderer": "python"
+    },
+    "[python]": {
+      "editor.insertSpaces": true,
+      "editor.tabSize": 4 2
+    },    
+    "cmake.configureOnOpen": false,
+    "terminal.integrated.profiles.windows": {
+      "PowerShell": {
+        "source": "PowerShell",
+        "icon": "terminal-powershell",
+        "args": ["-ExecutionPolicy", "Bypass"]
+      }
+    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+  }
