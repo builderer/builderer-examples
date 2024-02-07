@@ -51,6 +51,16 @@ pkg.cc_library_external(
         "{external:glfw_repo}/src/x11_monitor.c",
         "{external:glfw_repo}/src/x11_window.c",
         "{external:glfw_repo}/src/xkb_unicode.c",
+      ),
+      Case(Condition(platform="macos"),
+        "{external:glfw_repo}/src/cocoa_init.m",
+        "{external:glfw_repo}/src/cocoa_joystick.m",
+        "{external:glfw_repo}/src/cocoa_monitor.m",
+        "{external:glfw_repo}/src/cocoa_time.c",
+        "{external:glfw_repo}/src/cocoa_window.m",
+        "{external:glfw_repo}/src/nsgl_context.m",
+        "{external:glfw_repo}/src/posix_module.c",
+        "{external:glfw_repo}/src/posix_thread.c",
       )
     )
   ],
@@ -61,6 +71,7 @@ pkg.cc_library_external(
     Switch(
       Case(Condition(platform="windows"), "_GLFW_WIN32"),
       Case(Condition(platform="linux"),   "_GLFW_X11"),
+      Case(Condition(platform="macos"),   "_GLFW_COCOA"),
     ),
   ],
   deps = [
