@@ -49,8 +49,8 @@ msbuild Out/build/windows/Solution.sln /p:Platform=x64 /p:Configuration=debug
 
 ## <a id="vscode">VSCode Instructions</a>
 VSCode provides a consistent development solution for Windows, Mac and Linux
-that works well with Builderer workflow. As such taken care to ensure usage
-instructions are the same regardless of platform when using VSCode.
+that works well with Builderer workflow. As such care has been taken to ensure
+usage instructions are the same regardless of platform when using VSCode.
 ### Create Python Virtual Environment
 Ideally VSCode could pre-configure these steps, but until it does, here are the
 quick steps for configuring a Python Environment...
