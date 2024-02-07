@@ -27,7 +27,7 @@ CXX_COMPILE_FLAGS = Switch(
 
 WARNINGS_COMPILE_FLAGS = Switch(
     Case(Condition(toolchain="msvc"), 
-        "/W4", "/WX"),
+        "/W2", "/WX"),
     Case(Condition(toolchain=["clang","gcc"]), 
         "-Wall", "-Werror"),
 )

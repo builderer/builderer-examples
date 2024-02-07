@@ -28,6 +28,16 @@ pkg.cc_library_external(
     "{external:glfw_repo}/src/vulkan.c",
     "{external:glfw_repo}/src/window.c",
     Switch(
+      Case(Condition(platform="windows"),
+        "{external:glfw_repo}/src/wgl_context.c",
+        "{external:glfw_repo}/src/win32_init.c",
+        "{external:glfw_repo}/src/win32_joystick.c",
+        "{external:glfw_repo}/src/win32_module.c",
+        "{external:glfw_repo}/src/win32_monitor.c",
+        "{external:glfw_repo}/src/win32_thread.c",
+        "{external:glfw_repo}/src/win32_time.c",
+        "{external:glfw_repo}/src/win32_window.c",
+      ),
       Case(Condition(platform="linux"),
         "{external:glfw_repo}/src/egl_context.c",
         "{external:glfw_repo}/src/glx_context.c",
@@ -40,14 +50,18 @@ pkg.cc_library_external(
         "{external:glfw_repo}/src/x11_init.c",
         "{external:glfw_repo}/src/x11_monitor.c",
         "{external:glfw_repo}/src/x11_window.c",
-        "{external:glfw_repo}/src/xkb_unicode.c")
+        "{external:glfw_repo}/src/xkb_unicode.c",
+      )
     )
   ],
   public_includes = [
     "{external:glfw_repo}/include",
   ],
   private_defines = [
-    "_GLFW_X11",
+    Switch(
+      Case(Condition(platform="windows"), "_GLFW_WIN32"),
+      Case(Condition(platform="linux"),   "_GLFW_X11"),
+    ),
   ],
   deps = [
     ":glfw_repo",
