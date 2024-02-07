@@ -2,19 +2,23 @@
 This repository contains some example usage of [Builderer](https://github.com/builderer/builderer).
 
 # Instructions
-## Prerequisites
+- [Prerequisites](#prereqs)
+- [Command-Line Instructions](#cmdline)
+- [VSCode Instructions](#vscode)
+
+## <a id="prereqs">Prerequisites</a>
 * Git (required to fetch dependencies)
 * Python version >= 3.9 (required for generating build files)
 * VSCode (optional, but strongly recommended)
 * Windows
   * Visual Studio 2022 with "Desktop development with C++"
-* Mac
+* macOS
   * XCode Command-line Tools: `xcode-select --install`
 * Linux
   * C/C++ toolchain: `build-essential`, `g++-multilib`
   * GLFW requires: `libx11-dev`, `libxcursor-dev`, `libxinerama-dev`, `libxi-dev`
 
-## Command-line Instructions
+## <a id="cmdline">Command-line Instructions</a>
 For users that prefer building directly on command-line, or for the purposes of automation...
 ### Create Python Virtual Environment
 ```bash
@@ -43,9 +47,9 @@ builderer --config=windows generate
 msbuild Out/build/windows/Solution.sln /p:Platform=x64 /p:Configuration=debug
 ```
 
-## VSCode Instructions
-VSCode provides a seamless development solution for Windows, Mac and Linux that
-works well with Builderer workflow. As such taken care to ensure usage
+## <a id="vscode">VSCode Instructions</a>
+VSCode provides a consistent development solution for Windows, Mac and Linux
+that works well with Builderer workflow. As such taken care to ensure usage
 instructions are the same regardless of platform when using VSCode.
 ### Create Python Virtual Environment
 Ideally VSCode could pre-configure these steps, but until it does, here are the
