@@ -9,8 +9,10 @@
     },
     "[python]": {
       "editor.insertSpaces": true,
-      "editor.tabSize": 4 2
-    },    
+      "editor.tabSize": 2
+    },
+    "python.createEnvironment.trigger": "prompt",
+    "python.createEnvironment.contentButton": "show",
     "cmake.configureOnOpen": false,
     "terminal.integrated.profiles.windows": {
       "PowerShell": {
