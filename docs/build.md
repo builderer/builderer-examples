@@ -7,7 +7,7 @@
   * XCode Command-line Tools: `xcode-select --install`
 * Linux
   * C/C++ toolchain: `build-essential`, `g++-multilib`
-  * GLFW requires: `libx11-dev`, `libxcursor-dev`, `libxinerama-dev`, `libxi-dev`
+  * GLFW requires: `libx11-dev`, `libxcursor-dev`, `libxinerama-dev`, `libxi-dev`, `libxrandr-dev`
 
 # Build Instructions
 - [Building on Command-Line](build_cmdline.md)
