@@ -1,0 +1,2 @@
+[console_scripts]
+builderer = builderer.__main__:main
