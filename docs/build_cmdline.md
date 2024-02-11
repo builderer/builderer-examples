@@ -15,12 +15,12 @@ builderer --config=CONFIG_OF_CHOICE_HERE generate
 ## Building (Linux)
 ```bash
 builderer --config=linux generate
-make -C Out/build/linux -j$(nproc) build
+make -C Out/build/linux -j build
 ```
 ## Building (macOS)
 ```bash
 builderer --config=macos generate
-make -C Out/build/macos -j$(sysctl -n hw.logicalcpu) build
+make -C Out/build/macos -j build
 ```
 ## Building (Windows)
 ```bash
