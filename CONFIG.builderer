@@ -14,7 +14,7 @@ CTX.add_buildtool(
 CTX.add_config(
     name = "windows",
     platform = "windows",
-    architecture = ["x64", "Win32"],
+    architecture = ["x64", "Win32", "ARM64"],
     buildtool = "msbuild",
     toolchain = "msvc",
     build_config = ["debug", "release"],
@@ -25,7 +25,7 @@ CTX.add_config(
 CTX.add_config(
     name = "linux",
     platform = "linux",
-    architecture = ["x86_64", "x86"],
+    architecture = ["x86-64", "i686", "armv9-a"],
     buildtool = "make",
     toolchain = "gcc",
     build_config = ["debug", "release"],
@@ -36,7 +36,7 @@ CTX.add_config(
 CTX.add_config(
     name = "macos",
     platform = "macos",
-    architecture = ["x86_64"],
+    architecture = ["x86_64", "arm64"],
     buildtool = "make",
     toolchain = "clang",
     build_config = ["debug", "release"],
