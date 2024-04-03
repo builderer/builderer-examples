@@ -25,7 +25,7 @@ CTX.add_config(
 CTX.add_config(
     name = "linux",
     platform = "linux",
-    architecture = ["x86-64", "i686", "armv9-a"],
+    architecture = ["x86-64", "i386", "armv9-a"],
     buildtool = "make",
     toolchain = "gcc",
     build_config = ["debug", "release"],
