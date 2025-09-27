@@ -43,3 +43,14 @@ CTX.add_config(
     build_root = "Out/build/macos",
     sandbox_root = "Out/.sandbox",
 )
+
+CTX.add_config(
+    name = "emscripten",
+    platform = "emscripten",
+    architecture = ["wasm32"],
+    buildtool = "make",
+    toolchain = "emscripten",
+    build_config = ["release"],
+    build_root = "Out/build/emscripten",
+    sandbox_root = "Out/.sandbox",
+)

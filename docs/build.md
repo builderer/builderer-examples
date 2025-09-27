@@ -8,6 +8,8 @@
 * Linux
   * C/C++ toolchain: `build-essential`, `g++-multilib`
   * GLFW requires: `libx11-dev`, `libxcursor-dev`, `libxinerama-dev`, `libxi-dev`, `libxrandr-dev`
+* Web Assembly / Emscripten
+  * [Emscripten SDK](https://emscripten.org/)
 
 # Build Instructions
 - [Building on Command-Line](build_cmdline.md)

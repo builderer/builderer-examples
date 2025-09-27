@@ -8,7 +8,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 ## Generate Build Files
-Config options: `windows`, `linux`, `macos`
+Config options: `windows`, `linux`, `macos`, `emscripten`
 ```bash
 builderer --config=CONFIG_OF_CHOICE_HERE generate
 ```
@@ -21,6 +21,13 @@ make -C Out/build/linux -j build
 ```bash
 builderer --config=macos generate
 make -C Out/build/macos -j build
+```
+## Building (Emscripten)
+```bash
+builderer --config=emscripten generate
+make -C Out/build/emscripten -j build
+# Test with local server...
+python3 -m http.server 8080 --directory=Out/emscripten
 ```
 ## Building (Windows)
 ```bash

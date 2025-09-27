@@ -24,8 +24,13 @@
 //========================================================================
 //! [code]
 
+#if defined(__EMSCRIPTEN__)
+#include <GLES3/gl3.h>
+#include <emscripten/emscripten.h>
+#else
 #define GLAD_GL_IMPLEMENTATION
 #include <glad/gl.h>
+#endif
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -49,7 +54,12 @@ static const Vertex vertices[3] =
 };
 
 static const char* vertex_shader_text =
+#if defined(__EMSCRIPTEN__)
+"#version 300 es\n"
+"precision highp float;\n"
+#else
 "#version 330\n"
+#endif
 "uniform mat4 MVP;\n"
 "in vec3 vCol;\n"
 "in vec2 vPos;\n"
@@ -61,7 +71,12 @@ static const char* vertex_shader_text =
 "}\n";
 
 static const char* fragment_shader_text =
+#if defined(__EMSCRIPTEN__)
+"#version 300 es\n"
+"precision highp float;\n"
+#else
 "#version 330\n"
+#endif
 "in vec3 color;\n"
 "out vec4 fragment;\n"
 "void main()\n"
@@ -80,6 +95,47 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+typedef struct RenderContext
+{
+    GLFWwindow* window;
+    GLuint program;
+    GLuint vertex_array;
+    GLint mvp_location;
+} RenderContext;
+
+static void render_frame(const RenderContext* ctx)
+{
+    int width;
+    int height;
+    glfwGetFramebufferSize(ctx->window, &width, &height);
+    const float ratio = width / (float) height;
+
+    glViewport(0, 0, width, height);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    mat4x4 m;
+    mat4x4 p;
+    mat4x4 mvp;
+    mat4x4_identity(m);
+    mat4x4_rotate_Z(m, m, (float) glfwGetTime());
+    mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+    mat4x4_mul(mvp, p, m);
+
+    glUseProgram(ctx->program);
+    glUniformMatrix4fv(ctx->mvp_location, 1, GL_FALSE, (const GLfloat*) &mvp);
+    glBindVertexArray(ctx->vertex_array);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+#if defined(__EMSCRIPTEN__)
+static void emscripten_main_loop(void* arg)
+{
+    RenderContext* ctx = (RenderContext*) arg;
+    render_frame(ctx);
+    glfwPollEvents();
+}
+#endif
+
 int main(void)
 {
     glfwSetErrorCallback(error_callback);
@@ -87,9 +143,15 @@ int main(void)
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
+#if defined(__EMSCRIPTEN__)
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+#else
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 
     GLFWwindow* window = glfwCreateWindow(640, 480, "OpenGL Triangle", NULL, NULL);
     if (!window)
@@ -101,10 +163,12 @@ int main(void)
     glfwSetKeyCallback(window, key_callback);
 
     glfwMakeContextCurrent(window);
-    gladLoadGL(glfwGetProcAddress);
-    glfwSwapInterval(1);
-
-    // NOTE: OpenGL error checks have been omitted for brevity
+#ifndef __EMSCRIPTEN__
+    if (!gladLoadGL(glfwGetProcAddress)) {
+        fprintf(stderr, "Failed to load OpenGL\n");
+        exit(EXIT_FAILURE);
+    }
+#endif
 
     GLuint vertex_buffer;
     glGenBuffers(1, &vertex_buffer);
@@ -138,26 +202,16 @@ int main(void)
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(Vertex), (void*) offsetof(Vertex, col));
 
+    RenderContext ctx = { window, program, vertex_array, mvp_location };
+
+#if defined(__EMSCRIPTEN__)
+    emscripten_set_main_loop_arg(emscripten_main_loop, &ctx, 0, 1);
+#else
+    glfwSwapInterval(1);
+
     while (!glfwWindowShouldClose(window))
     {
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        const float ratio = width / (float) height;
-
-        glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        mat4x4 m, p, mvp;
-        mat4x4_identity(m);
-        mat4x4_rotate_Z(m, m, (float) glfwGetTime());
-        mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-        mat4x4_mul(mvp, p, m);
-
-        glUseProgram(program);
-        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) &mvp);
-        glBindVertexArray(vertex_array);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
+        render_frame(&ctx);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -166,6 +220,7 @@ int main(void)
 
     glfwTerminate();
     exit(EXIT_SUCCESS);
+#endif
 }
 
 //! [code]

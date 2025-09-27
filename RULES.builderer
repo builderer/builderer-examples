@@ -8,12 +8,14 @@ BASE_COMPILE_FLAGS = Switch(
     Case(Condition(platform="macos"),
         # Target 10.13 to maintain OpenGL support
         "-mmacosx-version-min=10.13"),
-    Case(Condition(platform="linux")),
+    Case(Condition(platform=["linux", "emscripten"])),
 )
 
 C_COMPILE_FLAGS = Switch(
-    Case(Condition(toolchain="msvc"),          "/stc:c17"),
-    Case(Condition(toolchain=["clang","gcc"]), "-std=gnu17"),
+    Case(Condition(toolchain="msvc"),
+        "/stc:c17"),
+    Case(Condition(toolchain=["clang","gcc", "emscripten"]),
+        "-std=gnu17"),
 )
 
 CXX_COMPILE_FLAGS = Switch(
@@ -21,21 +23,21 @@ CXX_COMPILE_FLAGS = Switch(
         "/Zc:__cplusplus",
         "/std:c++20",
         "/EHsc"),
-    Case(Condition(toolchain=["clang","gcc"]), 
+    Case(Condition(toolchain=["clang","gcc","emscripten"]), 
         "-std=c++20"),
 )
 
 WARNINGS_COMPILE_FLAGS = Switch(
     Case(Condition(toolchain="msvc"), 
         "/W2", "/WX"),
-    Case(Condition(toolchain=["clang","gcc"]), 
+    Case(Condition(toolchain=["clang","gcc","emscripten"]), 
         "-Wall", "-Werror"),
 )
 
 NO_WARNINGS_COMPILE_FLAGS = Switch(
     Case(Condition(toolchain="msvc"), 
         "/W0", "/WX-",),
-    Case(Condition(toolchain=["clang","gcc"]), 
+    Case(Condition(toolchain=["clang","gcc","emscripten"]), 
         "-w"),
 )
 
@@ -44,16 +46,16 @@ CONFIG_COMPILE_FLAGS = Switch(
         "/Od", "/Zi"),
     Case(Condition(toolchain="msvc", build_config=["profile", "release"]), 
         "/O2"),
-    Case(Condition(toolchain=["clang","gcc"], build_config="debug"), 
+    Case(Condition(toolchain=["clang","gcc","emscripten"], build_config="debug"), 
         "-O0", "-g"),
-    Case(Condition(toolchain=["clang","gcc"], build_config=["profile", "release"]), 
+    Case(Condition(toolchain=["clang","gcc","emscripten"], build_config=["profile", "release"]), 
         "-O2"),
 )
 
 CONFIG_LINK_FLAGS = Switch(
     Case(Condition(toolchain="msvc", build_config="debug"), 
         "/DEBUG"),
-    Case(Condition(toolchain=["clang","gcc"], build_config="debug"), 
+    Case(Condition(toolchain=["clang","gcc","emscripten"], build_config="debug"), 
         "-g"),
     Case(Condition()),
 )
@@ -123,6 +125,8 @@ def cc_binary(ctx, name: str, console_app: bool, private_defines=[], **kwargs):
                     "-framework", "Metal"),
                 Case(Condition(platform="linux"),
                     *(["-ldl", "-lpthread"] if console_app else ["-ldl", "-lpthread", "-lX11"])),
+                Case(Condition(platform="emscripten"),
+                    *["--use-port=contrib.glfw3"])
             ),
             CONFIG_LINK_FLAGS
         ],
@@ -147,6 +151,9 @@ def cc_binary(ctx, name: str, console_app: bool, private_defines=[], **kwargs):
                  f"Out/linux-profile/{name}"),
             Case(Condition(platform="linux", build_config="release"),
                  f"Out/linux-release/{name}"),
+
+            Case(Condition(platform="emscripten"),
+                 f"Out/emscripten/{name}.html"),
         ),
         **kwargs
     )
