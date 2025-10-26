@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "generate_build_files",
+      "label": "build_debug",
       "type": "shell",
       "options": {
         "cwd": "${workspaceFolder}"
@@ -10,59 +10,38 @@
       "command": "${command:python.interpreterPath}",
       "windows": {
         "args": [
-          "-m", "builderer",
+          "-m",
+          "builderer",
           "--config=windows",
-          "generate"
-        ]
-      },
-      "osx": {
-        "args": [
-          "-m", "builderer",
-          "--config=macos",
-          "generate"
-        ]
-      },
-      "linux": {
-        "args": [
-          "-m", "builderer",
-          "--config=linux",
-          "generate"
-        ]
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "build_debug",
-      "dependsOn": [
-        "generate_build_files"
-      ],
-      "windows": {
-        "command": "${workspaceFolder}/.vscode/vsbuild.cmd",
-        "args": [
-          "${workspaceFolder}/Out/build/windows/Solution.sln",
-          "/p:Platform=x64",
-          "/p:Configuration=debug"
+          "build",
+          "--build_config=debug",
+          "apps:triangle"
         ],
         "problemMatcher": [
           "$msCompile"
         ]
       },
       "osx": {
-        "type": "shell",
-        "command": "make build CONFIG=debug -C${workspaceFolder}/Out/build/macos -j$(sysctl -n hw.logicalcpu)",
+        "args": [
+          "-m",
+          "builderer",
+          "--config=macos",
+          "build",
+          "--build_config=debug",
+          "apps:triangle"
+        ],
         "problemMatcher": [
           "$gcc"
         ]
       },
       "linux": {
-        "type": "shell",
-        "command": "make",
         "args": [
-          "-C",
-          "${workspaceFolder}/Out/build/linux",
+          "-m",
+          "builderer",
+          "--config=linux",
           "build",
-          "-j$(nproc)",
-          "CONFIG=debug"
+          "--build_config=debug",
+          "apps:triangle"
         ],
         "problemMatcher": [
           "$gcc"
@@ -70,41 +49,50 @@
       },
       "group": {
         "kind": "build",
-        "isDefault": true
+        "isDefault": false
       }
     },
     {
       "label": "build_release",
-      "dependsOn": [
-        "generate_build_files"
-      ],
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "command": "${command:python.interpreterPath}",
       "windows": {
-        "command": "${workspaceFolder}/.vscode/vsbuild.cmd",
         "args": [
-          "${workspaceFolder}/Out/build/windows/Solution.sln",
-          "/p:Platform=x64",
-          "/p:Configuration=release"
+          "-m",
+          "builderer",
+          "--config=windows",
+          "build",
+          "--build_config=release",
+          "apps:triangle"
         ],
         "problemMatcher": [
           "$msCompile"
         ]
       },
       "osx": {
-        "type": "shell",
-        "command": "make build CONFIG=release -C${workspaceFolder}/Out/build/macos -j$(sysctl -n hw.logicalcpu)",
+        "args": [
+          "-m",
+          "builderer",
+          "--config=macos",
+          "build",
+          "--build_config=release",
+          "apps:triangle"
+        ],
         "problemMatcher": [
           "$gcc"
         ]
       },
       "linux": {
-        "type": "shell",
-        "command": "make",
         "args": [
-          "-C",
-          "${workspaceFolder}/Out/build/linux",
+          "-m",
+          "builderer",
+          "--config=linux",
           "build",
-          "-j$(nproc)",
-          "CONFIG=release"
+          "--build_config=release",
+          "apps:triangle"
         ],
         "problemMatcher": [
           "$gcc"
@@ -112,7 +100,7 @@
       },
       "group": {
         "kind": "build",
-        "isDefault": true
+        "isDefault": false
       }
     }
   ]
