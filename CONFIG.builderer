@@ -1,5 +1,6 @@
 from builderer.generators.msbuild import MsBuildGenerator
 from builderer.generators.make import MakeGenerator
+from builderer.generators.xcode import XcodeGenerator
 
 CTX.add_buildtool(
     name = "msbuild",
@@ -9,6 +10,11 @@ CTX.add_buildtool(
 CTX.add_buildtool(
     name = "make",
     generator = MakeGenerator,
+)
+
+CTX.add_buildtool(
+    name = "xcode",
+    generator = XcodeGenerator,
 )
 
 CTX.add_config(
@@ -36,10 +42,21 @@ CTX.add_config(
 CTX.add_config(
     name = "macos",
     platform = "macos",
-    architecture = ["x86_64", "arm64"],
+    architecture = ["arm64", "x86_64"],
     buildtool = "make",
     toolchain = "clang",
     build_config = ["debug", "release"],
     build_root = "Out/build/macos",
+    sandbox_root = "Out/.sandbox",
+)
+
+CTX.add_config(
+    name = "macos-xcode",
+    platform = "macos",
+    architecture = ["arm64", "x86_64"],
+    buildtool = "xcode",
+    toolchain = "clang",
+    build_config = ["debug", "release"],
+    build_root = "Out/build/macos-xcode.xcodeproj",
     sandbox_root = "Out/.sandbox",
 )
