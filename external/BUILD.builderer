@@ -10,6 +10,7 @@ pkg.git_repository(
 
 pkg.cc_library_external(
   name = "glfw",
+  condition = Condition(platform=["windows", "linux", "macos"]), # emscripten provides its own
   hdrs = [
     "{external:glfw_repo}/include/**/*.h",
   ],

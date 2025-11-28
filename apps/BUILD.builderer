@@ -1,3 +1,5 @@
+from builderer import Condition, Optional
+
 pkg = CTX.add_package("apps")
 
 pkg.cc_binary(
@@ -7,8 +9,7 @@ pkg.cc_binary(
       "triangle/*.c",
     ],
     deps = [
-      "external:glad",
-      "external:glfw",
       "external:linmath",
+      Optional(Condition(platform=["windows", "linux", "macos"]), "external:glfw", "external:glad"),
     ],
 )
