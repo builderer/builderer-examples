@@ -160,6 +160,24 @@ def cc_binary(ctx, name: str, console_app: bool, private_defines=[], **kwargs):
 
 CTX.add_rule(cc_binary)
 
+# Configure apple_application for first-party macOS bundles...
+def apple_application(ctx, name: str, **kwargs):
+    assert name.endswith(".app")
+    ctx.builtin.apple_application(
+        name = name,
+        output_path = Switch(
+            Case(Condition(platform="macos", build_config="debug"),
+                 f"Out/macos-debug/{name}"),
+            Case(Condition(platform="macos", build_config="profile"),
+                 f"Out/macos-profile/{name}"),
+            Case(Condition(platform="macos", build_config="release"),
+                 f"Out/macos-release/{name}"),
+        ),
+        **kwargs
+    )
+
+CTX.add_rule(apple_application)
+
 # Configure cc_library for thirt-party code (no warnings)...
 def cc_library_external(ctx, private_defines=[], **kwargs):
     ctx.builtin.cc_library(

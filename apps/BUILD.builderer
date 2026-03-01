@@ -13,3 +13,20 @@ pkg.cc_binary(
       Optional(Condition(platform=["windows", "linux", "macos"]), "external:glfw", "external:glad"),
     ],
 )
+
+pkg.apple_application(
+    name = "triangle.app",
+    condition = Condition(platform="macos"),
+    binary = ":triangle",
+    info_plist = {
+        "CFBundleExecutable": "triangle",
+        "CFBundleIdentifier": "org.builderer.triangle",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleName": "Triangle",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "0.1.0",
+        "CFBundleVersion": "1",
+        "LSMinimumSystemVersion": "13.0",
+    },
+    resources = [],
+)
