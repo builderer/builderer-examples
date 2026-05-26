@@ -1,0 +1,4 @@
+module CalcBridge {
+    header "calc.h"
+    export *
+}

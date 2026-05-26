@@ -204,3 +204,64 @@ def generate_files(ctx, **kwargs):
     ctx.builtin.generate_files(**kwargs)
 
 CTX.add_rule(generate_files)
+
+
+SWIFT_COMPILE_FLAGS = Switch(
+    Case(Condition(build_config="debug"),
+        "-Onone", "-g"),
+    Case(Condition(build_config=["profile", "release"]),
+        "-O"),
+)
+
+# Override the bare -target emitted by builderer core with one that carries
+# our deployment target. Last -target on the swiftc command line wins.
+# Per-arch because the triple must name an arch.
+SWIFT_TARGET_FLAGS = Switch(
+    Case(Condition(platform="macos", architecture="arm64"),
+        "-target", "arm64-apple-macos13.0"),
+    Case(Condition(platform="macos", architecture="x86_64"),
+        "-target", "x86_64-apple-macos13.0"),
+    Case(Condition()),
+)
+
+
+def swift_library(ctx, **kwargs):
+    ctx.builtin.swift_library(
+        swift_flags=[SWIFT_TARGET_FLAGS, SWIFT_COMPILE_FLAGS],
+        **kwargs,
+    )
+
+CTX.add_rule(swift_library)
+
+
+def swift_binary(ctx, name: str, **kwargs):
+    ctx.builtin.swift_binary(
+        name=name,
+        swift_flags=[SWIFT_TARGET_FLAGS, SWIFT_COMPILE_FLAGS],
+        link_flags=[
+            SWIFT_TARGET_FLAGS,
+            Switch(
+                Case(Condition(platform="macos"),
+                    "-framework", "Cocoa",
+                    "-framework", "SwiftUI"),
+                Case(Condition()),
+            ),
+        ],
+        output_path=Switch(
+            Case(Condition(platform="macos", build_config="debug"),
+                 f"Out/macos-debug/{name}"),
+            Case(Condition(platform="macos", build_config="profile"),
+                 f"Out/macos-profile/{name}"),
+            Case(Condition(platform="macos", build_config="release"),
+                 f"Out/macos-release/{name}"),
+        ),
+        **kwargs,
+    )
+
+CTX.add_rule(swift_binary)
+
+
+def swift_cc_module(ctx, **kwargs):
+    ctx.builtin.swift_cc_module(**kwargs)
+
+CTX.add_rule(swift_cc_module)

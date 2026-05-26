@@ -30,3 +30,43 @@ pkg.apple_application(
     },
     resources = [],
 )
+
+pkg.cc_library(
+    name = "calc_lib",
+    condition = Condition(platform="macos"),
+    srcs = ["calc/Lib/calc.cc"],
+    hdrs = ["calc/Lib/calc.h"],
+    public_includes = ["calc/Lib"],
+)
+
+pkg.swift_cc_module(
+    name = "CalcBridge",
+    condition = Condition(platform="macos"),
+    module_maps = ["calc/Lib/CalcBridge.modulemap"],
+    deps = [":calc_lib"],
+)
+
+pkg.swift_binary(
+    name = "calc",
+    condition = Condition(platform="macos"),
+    srcs = ["calc/*.swift"],
+    deps = [":CalcBridge"],
+)
+
+pkg.apple_application(
+    name = "calc.app",
+    condition = Condition(platform="macos"),
+    binary = ":calc",
+    info_plist = {
+        "CFBundleExecutable": "calc",
+        "CFBundleIdentifier": "org.builderer.calc",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleName": "Calc",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "0.1.0",
+        "CFBundleVersion": "1",
+        "LSMinimumSystemVersion": "13.0",
+        "NSPrincipalClass": "NSApplication",
+    },
+    resources = [],
+)

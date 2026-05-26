@@ -4,7 +4,7 @@ This repository demonstrates how to use [Builderer](https://github.com/builderer
 
 ## What is Builderer?
 
-Builderer is a fast, dependency-free build file generator for C/C++/Objective-C projects. It generates native build files (Makefiles, Visual Studio solutions) from Python-based build descriptions, supporting multiple platforms without the complexity of traditional meta-build systems.
+Builderer is a fast, dependency-free build file generator for C/C++/Objective-C/Swift projects. It generates native build files (Makefiles, Visual Studio solutions, Xcode projects) from Python-based build descriptions, supporting multiple platforms without the complexity of traditional meta-build systems.
 
 ## Quick Start
 
@@ -28,6 +28,7 @@ builderer --config=macos run apps:triangle
 
 This example project includes:
 - **Triangle demo** - A simple OpenGL application that works on Windows, macOS, Linux, and WebAssembly
+- **Calc demo (macOS only)** - A small SwiftUI application that calls a C++ library, demonstrating Swift ↔ C/C++ interop via `swift_cc_module`. Build with `builderer --config=macos build` or `builderer --config=macos-xcode build`, then `builderer --config=macos run apps:calc.app`. The target is gated on `Condition(platform="macos")` so non-macOS configs ignore it.
 - **Cross-platform builds** - Configured for Windows (MSBuild), macOS/Linux (Make), and Emscripten (WebAssembly)
 - **VSCode integration** - Pre-configured tasks and launch configurations
 - **External dependencies** - Demonstrates using git repositories (GLFW, glad, linmath)
