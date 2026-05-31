@@ -3,9 +3,6 @@
 #include <cstdio>
 #include <string>
 
-// Non-Apple command-line front end for calc_lib. Joins the args into a single
-// expression, evaluates it, and prints the result. With no args it reads one
-// expression per line from stdin.
 static int evaluate(const std::string& expr) {
     double result = calc_evaluate(expr.c_str());
     std::printf("%g\n", result);
