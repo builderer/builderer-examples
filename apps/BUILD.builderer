@@ -4,6 +4,8 @@ pkg = CTX.add_package("apps")
 
 pkg.cc_binary(
     name = "triangle",
+    # Desktop/web GL demo; not built for iOS.
+    condition = Condition(platform=["windows", "linux", "macos", "emscripten"]),
     console_app = True,
     srcs = [
       "triangle/*.c",
@@ -33,40 +35,55 @@ pkg.apple_application(
 
 pkg.cc_library(
     name = "calc_lib",
-    condition = Condition(platform="macos"),
-    srcs = ["calc/Lib/calc.cc"],
-    hdrs = ["calc/Lib/calc.h"],
-    public_includes = ["calc/Lib"],
+    srcs = ["calc/calc.cpp"],
+    hdrs = ["calc/*.h"],
+    public_includes = ["calc"],
+)
+
+pkg.cc_binary(
+    name = "calc_cli",
+    condition = Condition(platform=["windows", "linux", "macos"]),
+    console_app = True,
+    srcs = ["calc/calc_cli.cpp"],
+    deps = [":calc_lib"],
 )
 
 pkg.swift_cc_module(
-    name = "CalcBridge",
-    condition = Condition(platform="macos"),
-    module_maps = ["calc/Lib/CalcBridge.modulemap"],
+    name = "calc_bridge",
+    condition = Condition(platform=["macos", "ios"]),
+    module_maps = ["calc/calc_bridge.modulemap"],
     deps = [":calc_lib"],
 )
 
 pkg.swift_binary(
-    name = "calc",
-    condition = Condition(platform="macos"),
+    name = "calc_ui",
+    condition = Condition(platform=["macos", "ios"]),
     srcs = ["calc/*.swift"],
-    deps = [":CalcBridge"],
+    deps = [":calc_bridge"],
 )
 
 pkg.apple_application(
     name = "calc.app",
-    condition = Condition(platform="macos"),
-    binary = ":calc",
+    condition = Condition(platform=["macos", "ios"]),
+    binary = ":calc_ui",
+    device_families = [Optional(Condition(platform="ios"), "iphone", "ipad")],
+    # iOS device builds sign with the team supplied locally in .builderer.env
+    # (never committed).
+    development_team = Optional(Condition(platform="ios"), "{__env__:DEVELOPMENT_TEAM}"),
     info_plist = {
-        "CFBundleExecutable": "calc",
+        "CFBundleExecutable": "calc_ui",
         "CFBundleIdentifier": "org.builderer.calc",
         "CFBundleInfoDictionaryVersion": "6.0",
         "CFBundleName": "Calc",
         "CFBundlePackageType": "APPL",
         "CFBundleShortVersionString": "0.1.0",
         "CFBundleVersion": "1",
-        "LSMinimumSystemVersion": "13.0",
-        "NSPrincipalClass": "NSApplication",
+        # macOS-only...
+        "LSMinimumSystemVersion": Optional(Condition(platform="macos"), "13.0"),
+        "NSPrincipalClass":       Optional(Condition(platform="macos"), "NSApplication"),
+        # iOS-only...
+        "MinimumOSVersion": Optional(Condition(platform="ios"), "16.0"),
+        "UILaunchScreen":   Optional(Condition(platform="ios"), {}),
     },
     resources = [],
 )

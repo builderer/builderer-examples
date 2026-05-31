@@ -1,4 +1,5 @@
 import SwiftUI
+#if os(macOS)
 import AppKit
 
 final class CalcAppDelegate: NSObject, NSApplicationDelegate {
@@ -6,10 +7,13 @@ final class CalcAppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 }
+#endif
 
 @main
 struct CalcApp: App {
+#if os(macOS)
     @NSApplicationDelegateAdaptor(CalcAppDelegate.self) var appDelegate
+#endif
 
     var body: some Scene {
         WindowGroup {

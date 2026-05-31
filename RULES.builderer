@@ -8,7 +8,9 @@ BASE_COMPILE_FLAGS = Switch(
     Case(Condition(platform="macos"),
         # Target 10.13 to maintain OpenGL support
         "-mmacosx-version-min=10.13"),
-    Case(Condition(platform=["linux", "emscripten"])),
+    # iOS deployment target comes from the app's info_plist MinimumOSVersion ->
+    # IPHONEOS_DEPLOYMENT_TARGET build setting; no compile flag needed.
+    Case(Condition(platform=["linux", "emscripten", "ios"])),
 )
 
 C_COMPILE_FLAGS = Switch(
@@ -163,6 +165,8 @@ CTX.add_rule(cc_binary)
 # Configure apple_application for first-party macOS bundles...
 def apple_application(ctx, name: str, **kwargs):
     assert name.endswith(".app")
+    # output_path is the deployable (device) product location. For iOS, the
+    # simulator product is internal and goes to intermediates automatically.
     ctx.builtin.apple_application(
         name = name,
         output_path = Switch(
@@ -172,6 +176,12 @@ def apple_application(ctx, name: str, **kwargs):
                  f"Out/macos-profile/{name}"),
             Case(Condition(platform="macos", build_config="release"),
                  f"Out/macos-release/{name}"),
+            Case(Condition(platform="ios", build_config="debug"),
+                 f"Out/ios-debug/{name}"),
+            Case(Condition(platform="ios", build_config="profile"),
+                 f"Out/ios-profile/{name}"),
+            Case(Condition(platform="ios", build_config="release"),
+                 f"Out/ios-release/{name}"),
         ),
         **kwargs
     )
@@ -213,10 +223,13 @@ SWIFT_COMPILE_FLAGS = Switch(
         "-O"),
 )
 
-# Override the bare -target emitted by builderer core with one that carries
-# our deployment target. Last -target on the swiftc command line wins.
-# Per-arch because the triple must name an arch.
+# Swift target triple for the make build (make invokes swiftc directly and needs
+# an explicit -target). The xcode build does NOT get a baked -target: Xcode forms
+# the swiftc target from ARCHS + SDKROOT + the deployment-target build setting,
+# and a baked device triple would fight the simulator SDK. So this is gated to
+# the make buildtool only.
 SWIFT_TARGET_FLAGS = Switch(
+    Case(Condition(buildtool="xcode")),
     Case(Condition(platform="macos", architecture="arm64"),
         "-target", "arm64-apple-macos13.0"),
     Case(Condition(platform="macos", architecture="x86_64"),
@@ -244,6 +257,9 @@ def swift_binary(ctx, name: str, **kwargs):
                 Case(Condition(platform="macos"),
                     "-framework", "Cocoa",
                     "-framework", "SwiftUI"),
+                Case(Condition(platform="ios"),
+                    "-framework", "UIKit",
+                    "-framework", "SwiftUI"),
                 Case(Condition()),
             ),
         ],
@@ -254,6 +270,12 @@ def swift_binary(ctx, name: str, **kwargs):
                  f"Out/macos-profile/{name}"),
             Case(Condition(platform="macos", build_config="release"),
                  f"Out/macos-release/{name}"),
+            Case(Condition(platform="ios", build_config="debug"),
+                 f"Out/ios-debug/{name}"),
+            Case(Condition(platform="ios", build_config="profile"),
+                 f"Out/ios-profile/{name}"),
+            Case(Condition(platform="ios", build_config="release"),
+                 f"Out/ios-release/{name}"),
         ),
         **kwargs,
     )

@@ -61,6 +61,19 @@ CTX.add_config(
     sandbox_root = "Out/.sandbox",
 )
 
+# One iOS config builds both device and simulator from a single Xcode project;
+# choose at build/run time via `--device simulator|"<name>"`.
+CTX.add_config(
+    name = "ios",
+    platform = "ios",
+    architecture = ["arm64"],
+    buildtool = "xcode",
+    toolchain = "clang",
+    build_config = ["debug", "release"],
+    build_root = "Out/build/ios-xcode.xcodeproj",
+    sandbox_root = "Out/.sandbox",
+)
+
 CTX.add_config(
     name = "emscripten",
     platform = "emscripten",
