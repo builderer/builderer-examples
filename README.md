@@ -28,7 +28,9 @@ builderer --config=macos run apps:triangle
 
 This example project includes:
 - **Triangle demo** - A simple OpenGL application that works on Windows, macOS, Linux, and WebAssembly
-- **Calc demo (macOS only)** - A small SwiftUI application that calls a C++ library, demonstrating Swift ↔ C/C++ interop via `swift_cc_module`. Build with `builderer --config=macos build` or `builderer --config=macos-xcode build`, then `builderer --config=macos run apps:calc.app`. The target is gated on `Condition(platform="macos")` so non-macOS configs ignore it.
+- **Calc demo** - A C++ expression evaluator (`calc_lib`) with two front ends:
+  - `calc.app` - a SwiftUI app for macOS/iOS demonstrating Swift ↔ C/C++ interop via `swift_cc_module`: `builderer --config=macos run apps:calc.app`
+  - `calc_cli` - a command-line front end for Windows/Linux/macOS: `builderer --config=macos run apps:calc_cli -- "2 * (3 + 4)"`
 - **Cross-platform builds** - Configured for Windows (MSBuild), macOS/Linux (Make), and Emscripten (WebAssembly)
 - **VSCode integration** - Pre-configured tasks and launch configurations
 - **External dependencies** - Demonstrates using git repositories (GLFW, glad, linmath)
