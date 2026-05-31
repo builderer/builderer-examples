@@ -6,3 +6,6 @@
 # python
 __pycache__/
 .venv/
+
+# local, uncommitted {__env__:NAME} values (e.g. DEVELOPMENT_TEAM)
+.builderer.env
