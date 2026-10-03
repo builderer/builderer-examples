@@ -15,7 +15,7 @@ BASE_COMPILE_FLAGS = Switch(
 
 C_COMPILE_FLAGS = Switch(
     Case(Condition(toolchain="msvc"),
-        "/stc:c17"),
+        "/std:c17"),
     Case(Condition(toolchain=["clang","gcc", "emscripten"]),
         "-std=gnu17"),
 )
