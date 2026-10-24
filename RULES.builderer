@@ -6,8 +6,7 @@ BASE_COMPILE_FLAGS = Switch(
     Case(Condition(platform="windows", toolchain="msvc"),
         "/MT"),
     Case(Condition(platform="macos"),
-        # Target 10.13 to maintain OpenGL support
-        "-mmacosx-version-min=10.13"),
+        "-mmacosx-version-min=13.0"),
     # iOS deployment target comes from the app's info_plist MinimumOSVersion ->
     # IPHONEOS_DEPLOYMENT_TARGET build setting; no compile flag needed.
     Case(Condition(platform=["linux", "emscripten", "ios"])),
